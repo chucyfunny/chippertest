@@ -19,7 +19,7 @@ const token = request.headers['Authorization'] || '';
 if (!token) {
   // 如果没有找到 token，发送通知
   $notify('Token Missing', 'No token found in the request headers', '');
-  $done({});
+  $done({});  // 放行请求
 } else {
   // 准备发送到服务器的 POST 请求
   const headers = {
@@ -58,7 +58,7 @@ if (!token) {
           $notify('Response Error', 'Failed to parse the response', e.message);
         }
       }
-      $done({});
+      $done({});  // 放行请求
     }
   );
 }
