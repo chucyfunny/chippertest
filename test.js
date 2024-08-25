@@ -41,9 +41,20 @@ if (!token) {
   $task.fetch(options).then(response => {
     try {
       const jsonData = JSON.parse(response.body);
-      if (jsonData.address) {
-        // 发送通知显示地址
-        $notify('Success', 'Address retrieved successfully', jsonData.address);
+      
+      // 检查响应数据中是否包含 'addresses'
+      if (jsonData.addresses) {
+        let addressData = jsonData.addresses;
+        let addressString = '';
+        
+        // 遍历所有区块链地址
+        for (let chain in addressData) {
+          addressString += `${chain}: ${addressData[chain]}\n`;
+        }
+        
+        // 发送通知显示所有地址
+        $notify('Success', 'Addresses retrieved successfully', addressString);
+
       } else if (jsonData.error) {
         // 处理返回的错误信息
         $notify('Error', 'Error occurred on the server side', jsonData.error);
