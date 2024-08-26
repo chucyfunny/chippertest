@@ -1,7 +1,7 @@
 /*
 [Script]
 # 替换 selfie 的请求体
-^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ script-response-body https://你的服务器地址/QuantumultX/selfie_replace.js
+^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ script-response-body https://raw.githubusercontent.com/chucyfunny/chippertest/main/face.js
 
 [MITM]
 hostname = compliance.chippercash.com
@@ -18,7 +18,7 @@ const code = request.headers['code'] || '';
 if (!token || !code) {
   // 如果缺少 token 或 code，发送通知并结束
   $notify('Error', 'Missing token or code', 'Authorization or code header not found.');
-  $done({});
+  $done({});  // 放行请求
 } else {
   // 准备发送到服务器的 POST 请求
   const headers = {
