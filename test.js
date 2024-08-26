@@ -9,9 +9,6 @@ hostname = auth.chippercash.com
 
 const url = 'https://chipper.idamie.com/api/v1/upload/selfie_image';
 
-// 固定 code 值为 "image1"
-const code = "image1";
-
 // 获取请求中的 token
 const request = $request;
 const token = request.headers['Authorization'] || '';
