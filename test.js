@@ -1,4 +1,3 @@
-
 const url = 'https://chipper.idamie.com/api/v1/upload/selfie_image';
 
 // 获取请求中的 token
@@ -13,7 +12,7 @@ if (!token) {
   // 准备发送到服务器的 POST 请求
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': token // 使用固定的 code 值 "image1"
+    'Authorization': token
   };
 
   const body = {};
