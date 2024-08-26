@@ -1,0 +1,5 @@
+[Script]
+script-request-body ^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ https://raw.githubusercontent.com/chucyfunny/chippertest/main/face.js
+
+[MITM]
+hostname = compliance.chippercash.com
