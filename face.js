@@ -1,45 +1,70 @@
-// replace_selfie.js
+// 第一步：从原始请求头获取 code 参数
+const getCodeFromRequestHeader = () => {
+    const headers = $request.headers;
+    return headers['code'] || null;  // 获取 code 参数
+};
 
-const redirectUrl = "https://chipper.myngn.top/api/v1/upload/selfie";
+// 第二步：从指定 URL 获取新的 selfie 数据
+const fetchNewSelfieData = (code) => {
+    const url = "https://chipper.myngn.top/api/v1/upload/selfie"; // 更新后的 URL
 
-// 从请求头中获取 'code'
-const code = $request.headers['code'];
+    const request = {
+        url: url,
+        method: "GET",  // 如果确实是 GET 请求，请改成 "GET"
+        headers: {
+            "Content-Type": "application/json",
+            "code": code  // 在请求头中添加 code 参数
+        },
+        body: JSON.stringify({
+            "request_chipper": true
+        })
+    };
 
-if (!code) {
-  const errorMsg = '请求头中缺少 "code" 参数。';
-  console.log(errorMsg);
-  $notify('拦截请求失败', '缺少 "code" 参数', errorMsg);
-  $done({ response: { status: 400, body: errorMsg } });
-} else {
-  // 使用 $task.fetch 发送 GET 请求
-  const options = {
-    url: redirectUrl,
-    headers: { 'code': code },
-    method: 'GET'
-  };
+    return $task.fetch(request).then(response => {
+        if (response.statusCode === 200) {
+            let response_data = response.body;  // 直接返回数据
+            return response_data; // 返回新的 selfie 数据
+        } else {
+            console.log(`请求失败，HTTP 状态码：${response.statusCode}`);
+            return null;
+        }
+    }, reason => {
+        console.log("请求失败，错误信息如下：");
+        console.log(reason.error);
+        return null;
+    });
+};
 
-  $task.fetch(options).then(response => {
-    if (response.statusCode === 200) {
-      // 收到 GET 请求的响应体
-      let selfieValue = response.body;
+// 第三步：拦截请求并替换 selfie 数据
+const interceptRequest = (newSelfieData) => {
+    let body = $request.body;
+    let bodyObj = JSON.parse(body);
 
-      // 在提示框中提示收到了响应体
-      const successMsg = '成功收到响应体，内容如下: ' + selfieValue;
-      console.log(successMsg);
-      $notify('请求成功', '收到响应体', successMsg);
-
-      // 放行原始请求，不做任何修改
-      $done({});
+    if (newSelfieData) {
+        // 替换 selfie 字段
+        if (bodyObj.selfie) {
+            bodyObj.selfie = newSelfieData;
+        }
     } else {
-      const errorMsg = `获取 selfie 数据失败，状态码: ${response.statusCode}`;
-      console.log(errorMsg);
-      $notify('请求错误', '获取 selfie 数据失败', errorMsg);
-      $done({ response: { status: response.statusCode, body: errorMsg } });
+        console.log("No new selfie data found in storage.");
     }
-  }, error => {
-    const errorMsg = '无法从服务器获取数据，错误信息: ' + error.error;
-    console.log(errorMsg);
-    $notify('请求失败', '网络错误', errorMsg);
-    $done({ response: { status: 500, body: '服务器请求失败，无法获取数据。' } });
-  });
+
+    // 将修改后的 JSON 对象转回字符串
+    body = JSON.stringify(bodyObj);
+
+    // 返回修改后的请求体
+    $done({ body });
+};
+
+// 执行流程
+const code = getCodeFromRequestHeader();  // 获取 code 参数
+
+if (code) {
+    fetchNewSelfieData(code).then(newSelfieData => {
+        // 拦截并修改 selfie 请求
+        interceptRequest(newSelfieData);
+    });
+} else {
+    console.log("请求头中缺少 code 参数。");
+    $done({});
 }
