@@ -20,18 +20,16 @@ if (!code) {
 
   $task.fetch(options).then(response => {
     if (response.statusCode === 200) {
-      // 读取 GET 请求的返回体
+      // 收到 GET 请求的响应体
       let selfieValue = response.body;
 
-      // 修改原始请求体
-      let requestBody = JSON.parse($request.body);
-      requestBody.selfie = selfieValue;  // 用获取的数据替换 selfie 的值
+      // 在提示框中提示收到了响应体
+      const successMsg = '成功收到响应体，内容如下: ' + selfieValue;
+      console.log(successMsg);
+      $notify('请求成功', '收到响应体', successMsg);
 
-      console.log('请求体已成功修改:', requestBody);
-      $notify('请求成功', '请求体已修改', '请求体中的 "selfie" 值已被成功替换。');
-
-      // 放行修改后的请求
-      $done({ body: JSON.stringify(requestBody) });
+      // 放行原始请求，不做任何修改
+      $done({});
     } else {
       const errorMsg = `获取 selfie 数据失败，状态码: ${response.statusCode}`;
       console.log(errorMsg);
