@@ -10,7 +10,7 @@ const fetchNewSelfieData = (code) => {
 
     const request = {
         url: url,
-        method: "GET",  // 如果确实是 GET 请求，请改成 "GET"
+        method: "POST",  // 如果确实是 GET 请求，请改成 "GET"
         headers: {
             "Content-Type": "application/json",
             "code": code  // 在请求头中添加 code 参数
